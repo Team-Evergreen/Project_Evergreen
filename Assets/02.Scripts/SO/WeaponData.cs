@@ -15,7 +15,6 @@ public class WeaponData : ScriptableObject
     public float damage;  // 공격력
     public float fireRate;// 공격 주기
 
-    [Header("Type Check")]
     public bool isMelee; // true면 근거리, false면 원거리
 
     public GameObject projectilePrefab; // 원거리일 때만 사용

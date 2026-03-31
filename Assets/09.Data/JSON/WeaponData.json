@@ -3,6 +3,8 @@
     {
       "id": 1,
       "weaponName": "Pistol",
+      "projectilePrefab": "Bullet_Pistol",
+      "weaponAnim": "Anim_Pistol",
       "weaponType": 0,
       "equipTarget": 0,
       "speed": 1,
@@ -14,6 +16,8 @@
     {
       "id": 2,
       "weaponName": "Rifle",
+      "projectilePrefab": "Bullet_Rifle",
+      "weaponAnim": "Anim_Rifle",
       "weaponType": 1,
       "equipTarget": 0,
       "speed": 0.3,

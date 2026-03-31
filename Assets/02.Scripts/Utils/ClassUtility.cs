@@ -25,4 +25,20 @@ namespace Utils.ClassUtility
         public float range;
         public bool isMelee;
     }
+
+    // 적 데이터 구조
+    [Serializable]
+    public class EnemyDataList
+    {
+        public List<EnemyData> Enemys;
+    }
+
+    [Serializable]
+    public class EnemyData
+    {
+        public string enemyName;
+        public float hp;
+        public float speed;
+        public float damage;
+    }
 }

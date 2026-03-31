@@ -1,0 +1,18 @@
+{
+  "Enemys": [
+    {
+      "id": 1,
+      "enemyName": "Enemy1",
+      "hp": 100,
+      "speed": 2,
+      "damage": 10
+    },
+    {
+      "id": 2,
+      "enemyName": "Enemy2",
+      "hp": 100,
+      "speed": 2,
+      "damage": 10
+    }
+  ]
+}
