@@ -22,6 +22,7 @@ namespace Utils.ClassUtility
         public float speed;
         public float damage;
         public float fireRate;
+        public float lifetime;
         public float range;
         public bool isMelee;
     }

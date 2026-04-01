@@ -3,27 +3,29 @@
     {
       "id": 1,
       "weaponName": "Pistol",
-      "projectilePrefab": "Bullet_Pistol",
+      "projectilePrefab": "Projectile",
       "weaponAnim": "Anim_Pistol",
       "weaponType": 0,
       "equipTarget": 0,
-      "speed": 1,
+      "speed": 6,
       "range": 10,
       "damage": 5,
       "fireRate": 3,
+      "lifetime": 5,
       "isMelee": false
     },
     {
       "id": 2,
       "weaponName": "Rifle",
-      "projectilePrefab": "Bullet_Rifle",
+      "projectilePrefab": "Projectile",
       "weaponAnim": "Anim_Rifle",
       "weaponType": 1,
       "equipTarget": 0,
-      "speed": 0.3,
+      "speed": 6,
       "range": 10,
       "damage": 4,
       "fireRate": 3,
+      "lifetime": 5,
       "isMelee": true
     }
   ]

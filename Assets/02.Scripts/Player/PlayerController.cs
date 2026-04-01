@@ -1,9 +1,11 @@
 using UnityEngine;
+using Utils.ClassUtility;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Settings")]
     private SpriteRenderer spriteRenderer;
+    private Rigidbody2D rb;
     private float moveSpeed = 5f;
 
     [Header("Joystick Logic")]
@@ -19,6 +21,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Update()
@@ -65,11 +68,10 @@ public class PlayerController : MonoBehaviour
     {
         if (moveDirection != Vector2.zero)
         {
-            transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
             if (moveDirection.x != 0)
-            {
                 spriteRenderer.flipX = moveDirection.x < 0;
-            }
+
+            transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
         }
     }
 

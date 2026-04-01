@@ -3,32 +3,33 @@ using UnityEngine;
 // 투사체 기본 동작
 public class Projectile : MonoBehaviour
 {
+    private Vector2 direction;
     private float damage;
     private float speed;
 
-    public void Setup(float dmg, float spd)
+    public void Setup(float _damage, float _speed, float _lifeTime)
     {
-        damage = dmg;
-        speed = spd;
+        damage = _damage;
+        speed = _speed;
         // 5초 뒤 자동 소멸
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, _lifeTime);
     }
 
     private void Update()
     {
+        Debug.Log("총알 이동 중...");
         // 앞으로 전진
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        transform.Translate(Vector2.right * speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
     {
         if (_collision.CompareTag("Enemy"))
         {
-            // Enemy 스크립트의 TakeDamage 호출 (인터페이스 사용 권장)
-            // collision.GetComponent<IEntity>().TakeDamage(damage);
-
-            // 관통 기능이 없다면 파괴
-            Destroy(gameObject);
+            if (_collision.TryGetComponent(out EnemyController enemy))
+            {
+                enemy.TakeDamage(damage);
+            }
         }
     }
 }

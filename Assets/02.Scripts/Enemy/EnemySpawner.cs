@@ -1,12 +1,12 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public List<EnemyController> enemyPool; // 스폰할 적 종류들
-    private Transform player;         // 플레이어 위치
-    private float spawnRadius = 15f;  // 스폰 거리 (카메라 밖이어야 함)
-    private float spawnTime = 5.0f;   // 스폰 간격
+    public List<EnemyController> enemyPool;
+    private Transform player;        // 플레이어 위치
+    private float spawnRadius = 15f; // 스폰 거리 (카메라 밖이어야 함)
+    private float spawnTime = 5.0f;  // 스폰 간격
 
     private float timer = 0.0f;
 

@@ -5,17 +5,19 @@ public class EnemyController : MonoBehaviour
 {
     private SpriteRenderer spriteRenderer;
     public EnemyData enemyData;
+    private Rigidbody2D rb;
     private Transform target;
     private float currentHp;
 
     [Header("Attack Settings")]
-    private float attackRange = 0.8f;
+    private float attackRange = 0.5f;
     private float attackCooldown = 1f;
-    private float lastAttackTime;
+    public float currentTime = 0;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     private void Start()
@@ -36,7 +38,7 @@ public class EnemyController : MonoBehaviour
         currentHp = enemyData.hp;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (target == null) 
             return;
@@ -59,7 +61,7 @@ public class EnemyController : MonoBehaviour
     private void Move()
     {
         Vector2 direction = (target.position - transform.position).normalized;
-        transform.Translate(direction * enemyData.speed * Time.deltaTime);
+        rb.linearVelocity = direction * enemyData.speed;
 
         if (direction.x != 0)
         {
@@ -70,7 +72,7 @@ public class EnemyController : MonoBehaviour
     // 목적지 도착
     void OnReachedTarget()
     {
-        Debug.Log("적이 플레이어에게 도달하여 공격을 시작합니다!");
+        //rb.linearVelocity = Vector2.zero;
     }
 
     // 공격 받음
@@ -87,17 +89,17 @@ public class EnemyController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void OnTriggerStay2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D _collision)
     {
-        if (collision.CompareTag("Player"))
+        if (_collision.CompareTag("Player"))
         {
-            // 쿨타임이 지났는지 확인
-            if (Time.time >= lastAttackTime + attackCooldown)
+            currentTime += Time.deltaTime;
+
+            if (currentTime >= attackCooldown)
             {
                 // 플레이어 스크립트의 TakeDamage 호출
                 // collision.GetComponent<PlayerStats>().TakeDamage(damage);
-
-                lastAttackTime = Time.time;
+                currentTime = 0.0f;
                 Debug.Log("플레이어에게 대미지를 입혔습니다!");
             }
         }

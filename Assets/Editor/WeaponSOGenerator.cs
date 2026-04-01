@@ -43,26 +43,27 @@ public class WeaponSOGenerator : EditorWindow
             asset.range = data.range;
             asset.damage = data.damage;
             asset.fireRate = data.fireRate;
+            asset.lifetime = data.lifetime;
             asset.isMelee = data.isMelee;
 
             // 프리팹 로드 (Assets/03.Prefabs/Projectile/)
             if (!string.IsNullOrEmpty(data.projectilePrefab))
             {
-                asset.projectilePrefab = Resources.Load<GameObject>($"03.Prefabs/Projectile/{data.projectilePrefab}");
+                asset.projectilePrefab = Resources.Load<GameObject>("Projectile/" + data.projectilePrefab);
                 if (asset.projectilePrefab == null)
                     Debug.LogWarning($"{data.weaponName}: {data.projectilePrefab} 프리팹을 찾을 수 없습니다.");
             }
 
             // 애니메이터 로드 (Assets/05.Spine/Weapons/)
-            if (!string.IsNullOrEmpty(data.weaponAnim))
-            {
-                asset.weaponAnim = Resources.Load<RuntimeAnimatorController>($"05.Spine/Weapons/{data.weaponAnim}");
-                if (asset.weaponAnim == null)
-                    Debug.LogWarning($"{data.weaponName}: {data.weaponAnim} 애니메이터를 찾을 수 없습니다.");
-            }
+            //if (!string.IsNullOrEmpty(data.weaponAnim))
+            //{
+            //    asset.weaponAnim = Resources.Load<RuntimeAnimatorController>($"05.Spine/Weapons/{data.weaponAnim}");
+            //    if (asset.weaponAnim == null)
+            //        Debug.LogWarning($"{data.weaponName}: {data.weaponAnim} 애니메이터를 찾을 수 없습니다.");
+            //}
 
             // 파일 저장
-            string assetPath = $"Assets/Resources/Weapons/{data.weaponName}.asset";
+            string assetPath = $"Assets/08.ScriptableObjects/Weapons/{data.weaponName}.asset";
             // 동일한 이름의 파일이 있으면 덮어쓰기 위해 생성
             AssetDatabase.CreateAsset(asset, assetPath);
         }
