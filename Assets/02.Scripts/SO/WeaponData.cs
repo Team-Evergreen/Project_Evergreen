@@ -7,7 +7,7 @@ public class WeaponData : ScriptableObject
     [Header("Basic Info")]
     public string weaponName;
     public WeaponType weaponType;
-    public EquipTarget equipTarget;
+    public EquipTaype equipTarget;
 
     [Header("Attack Settings")]
     public float speed;   // 공격 속도

@@ -27,6 +27,20 @@
       "fireRate": 3,
       "lifetime": 5,
       "isMelee": true
+    },
+    {
+      "id": 3,
+      "weaponName": "Sniper",
+      "projectilePrefab": "Projectile",
+      "weaponAnim": "Anim_Sniper",
+      "weaponType": 1,
+      "equipTarget": 0,
+      "speed": 6,
+      "range": 10,
+      "damage": 4,
+      "fireRate": 3,
+      "lifetime": 5,
+      "isMelee": true
     }
   ]
 }

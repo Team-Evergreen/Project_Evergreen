@@ -27,13 +27,12 @@ public class UIManager : MonoBehaviour
 
     private void Init()
     {
-        HideJoystick();
+
     }
 
     // 조이스틱을 터치한 위치에 표시
     public void ShowJoystick(Vector2 _startPos)
     {
-        joystickBG.gameObject.SetActive(true);
         //joystickBG.position = _startPos;
         joystickHandle.anchoredPosition = Vector2.zero;
     }

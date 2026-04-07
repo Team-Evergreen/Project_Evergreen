@@ -60,7 +60,6 @@ public class PlayerController : MonoBehaviour
         {
             isMoving = false;
             moveDirection = Vector2.zero;
-            UIManager.Instance.HideJoystick();
         }
     }
 

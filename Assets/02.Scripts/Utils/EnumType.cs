@@ -44,7 +44,7 @@ namespace Utils.EnumType
     }
 
     // 무기 종류
-    public enum EquipTarget
+    public enum EquipTaype
     {
         Player,
         Vehicle

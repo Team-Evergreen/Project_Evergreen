@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerShooting : MonoBehaviour
 {
-    public WeaponData weaponData;   // 사용할 무기 데이터
-    private Transform firePoint;     // 총알이 생성될 위치 (예: 플레이어 앞쪽)
+    public WeaponData weaponData; // 사용할 무기 데이터
+    private Transform firePoint;  // 총알이 생성될 위치
 
     private PlayerController playerController;
     private float timer;
@@ -37,7 +37,6 @@ public class PlayerShooting : MonoBehaviour
 
         GameObject projectileObj = Instantiate(weaponData.projectilePrefab, firePoint.position, Quaternion.identity);
 
-        // 각도 계산: Atan2(y, x)
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
         projectileObj.transform.rotation = Quaternion.Euler(0, 0, angle);
 
