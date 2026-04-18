@@ -1,7 +1,7 @@
 using UnityEngine;
 using Utils.ClassUtility;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : DamageableEntity
 {
     [Header("Player Settings")]
     private SpriteRenderer spriteRenderer;
@@ -82,5 +82,10 @@ public class PlayerController : MonoBehaviour
             Gizmos.color = Color.cyan;
             Gizmos.DrawLine(touchStartPosition, currentTouchPosition);
         }
+    }
+
+    public override void TakeDamage(float _damage)
+    {
+        Debug.Log($"몬스터에게 {_damage}만큼 공격받음");
     }
 }

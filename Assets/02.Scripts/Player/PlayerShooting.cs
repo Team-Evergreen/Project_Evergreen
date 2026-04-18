@@ -1,50 +1,109 @@
 using UnityEngine;
 
+public interface IPlayerAttackStrategy
+{
+    void Attack(PlayerShooting _shooting, NewWeaponData _weaponData);
+}
+
 public class PlayerShooting : MonoBehaviour
 {
-    public WeaponData weaponData; // 사용할 무기 데이터
-    private Transform firePoint;  // 총알이 생성될 위치
+    public NewWeaponData currentWeaponData;
+    public Transform FirePoint;
+    public LineRenderer sniperLine;
+    public LayerMask enemyLayer;
 
     private PlayerController playerController;
     private float timer;
 
+    private IPlayerAttackStrategy currentAttackStrategy;
+
+    private SingleShotAttackStrategy singleShotStrategy;
+    private ShotgunAttackStrategy shotgunStrategy;
+    private SniperAttackStrategy sniperStrategy;
+    private AxeAttackStrategy axeStrategy;
+
     private void Awake()
     {
         playerController = GetComponent<PlayerController>();
-        firePoint = transform.Find("FirePoint");
+        if (FirePoint == null) FirePoint = transform.Find("FirePoint");
+        EnsureEnemyLayerMask();
+    }
+
+    private void Start()
+    {
+        ObjectPool objectPool = ObjectPool.Instance;
+
+        singleShotStrategy = new SingleShotAttackStrategy(objectPool);
+        shotgunStrategy = new ShotgunAttackStrategy(objectPool);
+        sniperStrategy = new SniperAttackStrategy();
+        axeStrategy = new AxeAttackStrategy();
+
+        SetWeapon(currentWeaponData);
     }
 
     private void Update()
     {
-        if (weaponData == null || weaponData.projectilePrefab == null) 
-            return;
+        if (currentWeaponData == null || currentAttackStrategy == null) return;
 
         timer += Time.deltaTime;
-        if (timer >= weaponData.fireRate)
+
+        if (timer >= currentWeaponData.AttackInterval)
         {
             Fire();
-            timer = 0;
+            timer = 0f;
         }
     }
 
-    private void Fire()
+    public Vector2 ShootDirection()
     {
-        Vector2 lookDir = playerController.LookDirection;
+        Vector2 lookDir = playerController != null ? playerController.LookDirection : Vector2.right;
 
-        // 만약 lookDir이 Zero라면 (게임을 막 시작했을 때) 기본 방향 설정
-        if (lookDir == Vector2.zero) 
-            lookDir = Vector2.right;
+        if (lookDir == Vector2.zero) lookDir = Vector2.right;
 
-        GameObject projectileObj = Instantiate(weaponData.projectilePrefab, firePoint.position, Quaternion.identity);
+        return lookDir.normalized;
+    }
 
-        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg;
-        projectileObj.transform.rotation = Quaternion.Euler(0, 0, angle);
+    public void Fire()
+    {
+        if (currentWeaponData == null || currentAttackStrategy == null) return;
 
-        if (projectileObj.TryGetComponent(out Projectile projectile))
+        currentAttackStrategy.Attack(this, currentWeaponData);
+    }
+
+    public void SetWeapon(NewWeaponData _weaponData)
+    {
+        currentWeaponData = _weaponData;
+        currentAttackStrategy = CreateStrategyByWeapon(_weaponData);
+        timer = 0f;
+
+        if (sniperLine != null)
         {
-            projectile.Setup(weaponData.damage, weaponData.speed, weaponData.lifetime);
+            sniperLine.positionCount = 0;
+            sniperLine.gameObject.SetActive(false);
         }
+    }
 
-        Debug.Log($"현재 발사 방향: {lookDir}, 계산된 각도: {angle}");
+    private void EnsureEnemyLayerMask()
+    {
+        if (enemyLayer.value != 0) return;
+
+        int enemyMask = LayerMask.GetMask("Enemy");
+        if (enemyMask != 0)
+        {
+            enemyLayer = enemyMask;
+        }
+        else
+        {
+            Debug.LogWarning("Enemy layer mask is empty and no Enemy layer exists.");
+        }
+    }
+
+    private IPlayerAttackStrategy CreateStrategyByWeapon(NewWeaponData _weaponData)
+    {
+        if (_weaponData is SingleShotWeaponData) return singleShotStrategy;
+        if (_weaponData is ShotgunWeaponData) return shotgunStrategy;
+        if (_weaponData is SniperWeaponData) return sniperStrategy;
+        if (_weaponData is AxeWeaponData) return axeStrategy;
+        return null;
     }
 }

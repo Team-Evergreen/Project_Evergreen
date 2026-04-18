@@ -1,7 +1,7 @@
 using UnityEngine;
 using Utils.ClassUtility;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : DamageableEntity
 {
     private SpriteRenderer spriteRenderer;
     public EnemyData enemyData;
@@ -12,7 +12,7 @@ public class EnemyController : MonoBehaviour
     [Header("Attack Settings")]
     private float attackRange = 0.5f;
     private float attackCooldown = 1f;
-    public float currentTime = 0;
+    public float currentTime = 0f;
 
     private void Awake()
     {
@@ -22,31 +22,48 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        enemyData = DataManager.Instance.LoadJson<EnemyDataList>(DataManager.Instance.enemyDataFileName).Enemys[0];
+        TryLoadEnemyData();
     }
 
-    // ½ºÆùµÉ ¶§ ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
-    public void Setup(Transform _target)
+    public void Setup(Transform _target, Vector2 _spawnPos)
     {
-        if (enemyData == null)
+        if ((enemyData == null || enemyData.hp <= 0f) && !TryLoadEnemyData())
         {
-            Debug.LogError($"{gameObject.name}¿¡ EnemyData°¡ ÇÒ´çµÇÁö ¾Ê¾Ò½À´Ï´Ù!");
+            Debug.LogError($"{gameObject.name}ì— EnemyDataê°€ í• ë‹¹ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤!");
             return;
         }
 
+        if (rb == null) rb = GetComponent<Rigidbody2D>();
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+
+        transform.position = _spawnPos;
         target = _target;
         currentHp = enemyData.hp;
+        currentTime = 0f;
+
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
+    }
+
+    private bool TryLoadEnemyData()
+    {
+        if (DataManager.Instance == null) return false;
+
+        EnemyDataList dataList = DataManager.Instance.LoadJson<EnemyDataList>(DataManager.Instance.enemyDataFileName);
+        if (dataList == null || dataList.Enemys == null || dataList.Enemys.Count == 0)
+            return false;
+
+        enemyData = dataList.Enemys[0];
+        return enemyData != null && enemyData.hp > 0f;
     }
 
     private void FixedUpdate()
     {
-        if (target == null) 
+        if (target == null)
             return;
 
-        // °Å¸®ÀÇ Á¦°ö°ªÀ» ±¸ÇÔ (·çÆ® ¿¬»êÀÌ ¾ø¾î ÈÎ¾À ºü¸§)
         float sqrDistance = (target.position - transform.position).sqrMagnitude;
 
-        // ºñ±³ ´ë»óÀÎ »ç°Å¸®µµ Á¦°öÇØ¼­ ºñ±³
         if (sqrDistance <= attackRange * attackRange)
         {
             OnReachedTarget();
@@ -57,36 +74,43 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    // ÀÌµ¿
     private void Move()
     {
+        if (rb == null || enemyData == null) return;
+
         Vector2 direction = (target.position - transform.position).normalized;
         rb.linearVelocity = direction * enemyData.speed;
 
-        if (direction.x != 0)
+        if (spriteRenderer != null && direction.x != 0f)
         {
-            spriteRenderer.flipX = direction.x < 0;
+            spriteRenderer.flipX = direction.x < 0f;
         }
     }
 
-    // ¸ñÀûÁö µµÂø
-    void OnReachedTarget()
+    private void OnReachedTarget()
     {
-        //rb.linearVelocity = Vector2.zero;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
     }
 
-    // °ø°Ý ¹ÞÀ½
-    public void TakeDamage(float _amount)
+    public override void TakeDamage(float _damage)
     {
-        currentHp -= _amount;
-        if (currentHp <= 0) Die();
+        currentHp -= _damage;
+        if (currentHp <= 0f) Die();
     }
 
-    // »ç¸Á
     private void Die()
     {
-        // °æÇèÄ¡ ¾ÆÀÌÅÛ µå¶ø ·ÎÁ÷ µîÀ» ¿©±â¿¡ Ãß°¡
-        Destroy(gameObject);
+        ReturnToPool();
+    }
+
+    private void ReturnToPool()
+    {
+        target = null;
+        currentTime = 0f;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        if (ObjectPool.Instance != null)
+            ObjectPool.Instance.ReturnEnemy(this);
     }
 
     private void OnTriggerStay2D(Collider2D _collision)
@@ -97,10 +121,9 @@ public class EnemyController : MonoBehaviour
 
             if (currentTime >= attackCooldown)
             {
-                // ÇÃ·¹ÀÌ¾î ½ºÅ©¸³Æ®ÀÇ TakeDamage È£Ãâ
-                // collision.GetComponent<PlayerStats>().TakeDamage(damage);
                 currentTime = 0.0f;
-                Debug.Log("ÇÃ·¹ÀÌ¾î¿¡°Ô ´ë¹ÌÁö¸¦ ÀÔÇû½À´Ï´Ù!");
+                if (_collision.TryGetComponent(out DamageableEntity target))
+                    target.TakeDamage(enemyData.damage);
             }
         }
     }
