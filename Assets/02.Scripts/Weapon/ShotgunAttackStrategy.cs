@@ -14,7 +14,7 @@ public class ShotgunAttackStrategy : IPlayerAttackStrategy
         this.objectPool = _objectPool;
     }
 
-    public void Attack(PlayerShooting _shooting, NewWeaponData _weaponData)
+    public void Attack(PlayerWeaponController _weaponController, NewWeaponData _weaponData)
     {
         ShotgunWeaponData data = _weaponData as ShotgunWeaponData;
         if (data == null) return;
@@ -32,13 +32,13 @@ public class ShotgunAttackStrategy : IPlayerAttackStrategy
             float offsetAngle = startAngle + angleStep * i;
 
             // 현재 바라보는 방향을 기준으로 offsetAngle 만큼 회전
-            Vector2 shotDirection = RotateVector(_shooting.ShootDirection(), offsetAngle);
+            Vector2 shotDirection = RotateVector(_weaponController.ShootDirection(), offsetAngle);
             float angle = Mathf.Atan2(shotDirection.y, shotDirection.x) * Mathf.Rad2Deg;
 
             Projectile projectile = objectPool.GetProjectile();
             if (projectile == null) continue;
 
-            projectile.Setup(_shooting.enemyLayer, data.Damage, data.ProjectileSpeed, _shooting.FirePoint.position, angle);
+            projectile.Setup(_weaponController.enemyLayer, data.Damage, data.ProjectileSpeed, _weaponController.FirePoint.position, angle);
             projectile.gameObject.SetActive(true);
         }
     }

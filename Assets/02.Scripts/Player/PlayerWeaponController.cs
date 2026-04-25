@@ -2,10 +2,10 @@ using UnityEngine;
 
 public interface IPlayerAttackStrategy
 {
-    void Attack(PlayerShooting _shooting, NewWeaponData _weaponData);
+    void Attack(PlayerWeaponController _weaponController, NewWeaponData _weaponData);
 }
 
-public class PlayerShooting : MonoBehaviour
+public class PlayerWeaponController : MonoBehaviour
 {
     public NewWeaponData currentWeaponData;
     public Transform FirePoint;
@@ -49,9 +49,15 @@ public class PlayerShooting : MonoBehaviour
 
         if (timer >= currentWeaponData.AttackInterval)
         {
-            Fire();
+            PlayerAttack();
             timer = 0f;
         }
+    }
+
+    public void SetWeaponEnabled()
+    {
+        currentWeaponData = null;
+        currentAttackStrategy = null;
     }
 
     public Vector2 ShootDirection()
@@ -63,7 +69,7 @@ public class PlayerShooting : MonoBehaviour
         return lookDir.normalized;
     }
 
-    public void Fire()
+    public void PlayerAttack()
     {
         if (currentWeaponData == null || currentAttackStrategy == null) return;
 

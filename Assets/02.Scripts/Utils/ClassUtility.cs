@@ -37,9 +37,11 @@ namespace Utils.ClassUtility
     [Serializable]
     public class EnemyData
     {
+        public int id;
         public string enemyName;
-        public float hp;
+        public float maxHP;
         public float speed;
         public float damage;
+        public float scale;
     }
 }

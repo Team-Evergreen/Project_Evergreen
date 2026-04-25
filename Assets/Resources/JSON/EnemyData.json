@@ -2,17 +2,19 @@
   "Enemys": [
     {
       "id": 1,
-      "enemyName": "Enemy1",
-      "hp": 10,
+      "enemyName": "SmallZombie",
+      "maxHP": 10,
       "speed": 1,
-      "damage": 10
+      "damage": 10,
+      "scale": 1.0
     },
     {
       "id": 2,
-      "enemyName": "Enemy2",
-      "hp": 100,
+      "enemyName": "MiddleZombie",
+      "maxHP": 20,
       "speed": 1,
-      "damage": 10
+      "damage": 10,
+      "scale": 1.3
     }
   ]
 }

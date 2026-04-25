@@ -17,6 +17,7 @@ public class PlayerController : DamageableEntity
     public Vector2 LookDirection = Vector2.right;
 
     private bool isMoving = false;
+    private bool isInputEnabled = true;
 
     private void Awake()
     {
@@ -26,8 +27,30 @@ public class PlayerController : DamageableEntity
 
     private void Update()
     {
+        if (!isInputEnabled)
+        {
+            moveDirection = Vector2.zero;
+            return;
+        }
+
         InputHandler();
         MovePlayer();
+    }
+
+    public void SetInputEnabled(bool _enabled)
+    {
+        isInputEnabled = _enabled;
+
+        if (!_enabled)
+        {
+            // ¿‘∑¬ ≤Ù∏È ¡ÔΩ√ ∏ÿ√ﬂ∞‘
+            isMoving = false;
+            moveDirection = Vector2.zero;
+
+            // ¡∂¿ÃΩ∫∆Ω º˚±‚±‚ (¿÷¿∏∏È)
+            if (UIManager.Instance != null)
+                UIManager.Instance.HideJoystick();
+        }
     }
 
     private void InputHandler()

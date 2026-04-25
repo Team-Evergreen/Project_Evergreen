@@ -3,11 +3,18 @@ using Utils.ClassUtility;
 
 public class EnemyController : DamageableEntity
 {
+    [Header("References")]
+    [SerializeField] private EnemyHPBar enemyHPBar;
+
     private SpriteRenderer spriteRenderer;
-    public EnemyData enemyData;
     private Rigidbody2D rb;
     private Transform target;
+
+
+    [Header("Runtime Data")]
+    private EnemyData enemyData;
     private float currentHp;
+
 
     [Header("Attack Settings")]
     private float attackRange = 0.5f;
@@ -17,44 +24,23 @@ public class EnemyController : DamageableEntity
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        if (enemyHPBar == null) enemyHPBar = GetComponentInChildren<EnemyHPBar>();
         rb = GetComponent<Rigidbody2D>();
     }
 
-    private void Start()
+    public void Setup(Transform target, Vector2 spawnPosition, EnemyData enemyData)
     {
-        TryLoadEnemyData();
-    }
+        this.target = target;
+        this.enemyData = enemyData;
 
-    public void Setup(Transform _target, Vector2 _spawnPos)
-    {
-        if ((enemyData == null || enemyData.hp <= 0f) && !TryLoadEnemyData())
-        {
-            Debug.LogError($"{gameObject.name}에 EnemyData가 할당되지 않았습니다!");
-            return;
-        }
+        transform.position = spawnPosition;
+        currentHp = enemyData.maxHP;
+        transform.localScale = Vector3.one * enemyData.scale;
 
-        if (rb == null) rb = GetComponent<Rigidbody2D>();
-        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        gameObject.SetActive(true);
 
-        transform.position = _spawnPos;
-        target = _target;
-        currentHp = enemyData.hp;
-        currentTime = 0f;
-
-        if (rb != null) rb.linearVelocity = Vector2.zero;
-        if (!gameObject.activeSelf) gameObject.SetActive(true);
-    }
-
-    private bool TryLoadEnemyData()
-    {
-        if (DataManager.Instance == null) return false;
-
-        EnemyDataList dataList = DataManager.Instance.LoadJson<EnemyDataList>(DataManager.Instance.enemyDataFileName);
-        if (dataList == null || dataList.Enemys == null || dataList.Enemys.Count == 0)
-            return false;
-
-        enemyData = dataList.Enemys[0];
-        return enemyData != null && enemyData.hp > 0f;
+        if (enemyHPBar != null)
+            enemyHPBar.Init(enemyData.maxHP);
     }
 
     private void FixedUpdate()
@@ -94,7 +80,9 @@ public class EnemyController : DamageableEntity
 
     public override void TakeDamage(float _damage)
     {
-        currentHp -= _damage;
+        currentHp = Mathf.Max(0f, currentHp - _damage);
+        enemyHPBar.SetHP(currentHp);
+
         if (currentHp <= 0f) Die();
     }
 

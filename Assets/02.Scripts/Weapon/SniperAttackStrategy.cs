@@ -6,19 +6,19 @@ public class SniperAttackStrategy : IPlayerAttackStrategy
     private bool isCharging;
     private float nextAttackTime;
 
-    public void Attack(PlayerShooting _shooting, NewWeaponData _weaponData)
+    public void Attack(PlayerWeaponController _weaponController, NewWeaponData _weaponData)
     {
         SniperWeaponData data = _weaponData as SniperWeaponData;
         if (data == null || isCharging || Time.time < nextAttackTime) return;
 
-        RunSniperAttack(_shooting, data).Forget();
+        RunSniperAttack(_weaponController, data).Forget();
     }
 
-    private async UniTaskVoid RunSniperAttack(PlayerShooting _shooting, SniperWeaponData _data)
+    private async UniTaskVoid RunSniperAttack(PlayerWeaponController _weaponController, SniperWeaponData _data)
     {
         isCharging = true;
         bool fired = false;
-        LineRenderer line = _shooting != null ? _shooting.sniperLine : null;
+        LineRenderer line = _weaponController != null ? _weaponController.sniperLine : null;
 
         try
         {
@@ -33,18 +33,18 @@ public class SniperAttackStrategy : IPlayerAttackStrategy
 
             while (elapsed < duration)
             {
-                if (!CanContinue(_shooting, _data)) return;
+                if (!CanContinue(_weaponController, _data)) return;
 
                 elapsed += Time.deltaTime;
                 float t = duration > 0f ? Mathf.Clamp01(elapsed / duration) : 1f;
-                DrawChargeLine(_shooting, _data, line, t);
+                DrawChargeLine(_weaponController, _data, line, t);
 
                 await UniTask.Yield(PlayerLoopTiming.Update);
             }
 
-            if (!CanContinue(_shooting, _data)) return;
+            if (!CanContinue(_weaponController, _data)) return;
 
-            DrawChargeLine(_shooting, _data, line, 1f);
+            DrawChargeLine(_weaponController, _data, line, 1f);
 
             if (line != null)
             {
@@ -52,7 +52,7 @@ public class SniperAttackStrategy : IPlayerAttackStrategy
                 line.endColor = _data.FireColor;
             }
 
-            FireRayCast(_shooting, _data);
+            FireRayCast(_weaponController, _data);
             fired = true;
 
             await UniTask.Yield(PlayerLoopTiming.Update);
@@ -70,19 +70,19 @@ public class SniperAttackStrategy : IPlayerAttackStrategy
         }
     }
 
-    private bool CanContinue(PlayerShooting _shooting, SniperWeaponData _data)
+    private bool CanContinue(PlayerWeaponController _weaponController, SniperWeaponData _data)
     {
-        return _shooting != null
-            && _shooting.FirePoint != null
-            && _shooting.currentWeaponData == _data;
+        return _weaponController != null
+            && _weaponController.FirePoint != null
+            && _weaponController.currentWeaponData == _data;
     }
 
-    private void DrawChargeLine(PlayerShooting _shooting, SniperWeaponData _data, LineRenderer _line, float _t)
+    private void DrawChargeLine(PlayerWeaponController _weaponController, SniperWeaponData _data, LineRenderer _line, float _t)
     {
-        if (_line == null || _shooting == null || _shooting.FirePoint == null) return;
+        if (_line == null || _weaponController == null || _weaponController.FirePoint == null) return;
 
-        Vector3 start = _shooting.FirePoint.position;
-        Vector3 end = start + (Vector3)(_shooting.ShootDirection() * 200f);
+        Vector3 start = _weaponController.FirePoint.position;
+        Vector3 end = start + (Vector3)(_weaponController.ShootDirection() * 200f);
 
         _line.SetPosition(0, start);
         _line.SetPosition(1, end);
@@ -94,13 +94,13 @@ public class SniperAttackStrategy : IPlayerAttackStrategy
         _line.endColor = _data.ChargeColor;
     }
 
-    private void FireRayCast(PlayerShooting _shooting, SniperWeaponData _data)
+    private void FireRayCast(PlayerWeaponController _weaponController, SniperWeaponData _data)
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(
-            _shooting.FirePoint.position,
-            _shooting.ShootDirection(),
+            _weaponController.FirePoint.position,
+            _weaponController.ShootDirection(),
             Mathf.Infinity,
-            _shooting.enemyLayer
+            _weaponController.enemyLayer
         );
 
         for (int i = 0; i < hits.Length; i++)

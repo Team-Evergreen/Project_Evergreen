@@ -7,22 +7,22 @@ public class AxeAttackStrategy : IPlayerAttackStrategy
     private readonly Collider2D[] results = new Collider2D[20];
     private bool isShowingRange;
 
-    public void Attack(PlayerShooting _shooting, NewWeaponData _weaponData)
+    public void Attack(PlayerWeaponController _weaponController, NewWeaponData _weaponData)
     {
         AxeWeaponData data = _weaponData as AxeWeaponData;
-        if (data == null || _shooting == null) return;
+        if (data == null || _weaponController == null) return;
 
-        ExecuteDamage(_shooting, data);
-        ShowAxeRangeAsync(_shooting, data).Forget();
+        ExecuteDamage(_weaponController, data);
+        ShowAxeRangeAsync(_weaponController, data).Forget();
     }
 
-    private void ExecuteDamage(PlayerShooting _shooting, AxeWeaponData _data)
+    private void ExecuteDamage(PlayerWeaponController _weaponController, AxeWeaponData _data)
     {
-        Vector2 center = _shooting.transform.position;
-        Vector2 forward = _shooting.ShootDirection();
+        Vector2 center = _weaponController.transform.position;
+        Vector2 forward = _weaponController.ShootDirection();
 
         ContactFilter2D contactFilter = new ContactFilter2D();
-        contactFilter.SetLayerMask(_shooting.enemyLayer);
+        contactFilter.SetLayerMask(_weaponController.enemyLayer);
 
         int count = Physics2D.OverlapCircle(center, _data.AttackRadius, contactFilter, results);
 
@@ -44,12 +44,12 @@ public class AxeAttackStrategy : IPlayerAttackStrategy
         }
     }
 
-    private async UniTaskVoid ShowAxeRangeAsync(PlayerShooting _shooting, AxeWeaponData _data)
+    private async UniTaskVoid ShowAxeRangeAsync(PlayerWeaponController _weaponController, AxeWeaponData _data)
     {
-        if (isShowingRange || _shooting == null || _shooting.sniperLine == null) return;
+        if (isShowingRange || _weaponController == null || _weaponController.sniperLine == null) return;
 
         isShowingRange = true;
-        LineRenderer line = _shooting.sniperLine;
+        LineRenderer line = _weaponController.sniperLine;
 
         try
         {
@@ -58,12 +58,12 @@ public class AxeAttackStrategy : IPlayerAttackStrategy
             float elapsed = 0f;
             while (elapsed < RangeDisplayDuration)
             {
-                if (_shooting == null || _shooting.currentWeaponData != _data) return;
+                if (_weaponController == null || _weaponController.currentWeaponData != _data) return;
 
                 DrawFan(
                     line,
-                    _shooting.transform.position,
-                    _shooting.ShootDirection(),
+                    _weaponController.transform.position,
+                    _weaponController.ShootDirection(),
                     _data.AttackRadius,
                     _data.AttackAngle,
                     16
@@ -77,7 +77,7 @@ public class AxeAttackStrategy : IPlayerAttackStrategy
         {
             isShowingRange = false;
 
-            if (_shooting != null && _shooting.currentWeaponData == _data && line != null)
+            if (_weaponController != null && _weaponController.currentWeaponData == _data && line != null)
             {
                 line.positionCount = 0;
                 line.gameObject.SetActive(false);

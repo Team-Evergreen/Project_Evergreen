@@ -125,17 +125,4 @@ public class ObjectPool : MonoBehaviour
         if (_enemy.gameObject.activeSelf) _enemy.gameObject.SetActive(false);
         enemyPool.Enqueue(_enemy);
     }
-
-    public void DeactivateAllObjects()
-    {
-        foreach (Projectile projectile in projectilePool)
-        {
-            if (projectile != null && projectile.gameObject.activeSelf) projectile.gameObject.SetActive(false);
-        }
-
-        foreach (EnemyController enemy in enemyPool)
-        {
-            if (enemy != null && enemy.gameObject.activeSelf) enemy.gameObject.SetActive(false);
-        }
-    }
 }
